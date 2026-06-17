@@ -6,9 +6,9 @@ use serde::Deserialize;
 /// Reference: <https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/authenticating_users_with_sign_in_with_apple>
 #[derive(Debug, Clone, Deserialize)]
 pub struct AppleIdTokenClaims {
-    /// The issuer — always `"https://appleid.apple.com"`.
+    /// The issuer that always `"https://appleid.apple.com"`.
     pub iss: String,
-    /// The audience — your application's bundle ID / Client Identifier.
+    /// The audience i.e your application's bundle ID / Client Identifier.
     pub aud: String,
     /// Token issuance time as Unix epoch seconds.
     pub iat: u64,

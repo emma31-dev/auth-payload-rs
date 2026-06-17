@@ -6,9 +6,9 @@ use serde::Deserialize;
 /// Reference: <https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2>
 #[derive(Debug, Clone, Deserialize)]
 pub struct LinkedInIdTokenClaims {
-    /// The issuer identifier — always `"https://www.linkedin.com"`.
+    /// The issuer identifier, always `"https://www.linkedin.com"`.
     pub iss: String,
-    /// The audience — your application's Client Identifier.
+    /// The audience, your application's Client Identifier.
     pub aud: String,
     /// Token issuance time as Unix epoch seconds.
     pub iat: u64,

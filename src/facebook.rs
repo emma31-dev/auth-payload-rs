@@ -11,7 +11,7 @@ use serde::Deserialize;
 /// **Additional fields** require the listed permission to be granted by the user.
 #[derive(Debug, Clone, Deserialize)]
 pub struct FacebookUserPayload {
-    /// App-Scoped User ID (ASID). Unique to your App ID — not a global Facebook ID.
+    /// App-Scoped User ID (ASID). Unique to your App ID not a global Facebook ID.
     /// This value is stable for a given user + app pair. Always use this as the primary identifier.
     pub id: String,
     /// The user's full name. Part of `public_profile`.

@@ -9,7 +9,7 @@ pub struct MicrosoftIdTokenClaims {
     /// The issuer URI identifying the Security Token Service (STS) that constructed the token,
     /// e.g. `"https://login.microsoftonline.com/{tenant}/v2.0"`.
     pub iss: String,
-    /// The audience the token is intended for — your application's Client Identifier.
+    /// The audience the token is intended for your application's Client Identifier.
     pub aud: String,
     /// Token issuance time as Unix epoch seconds.
     pub iat: u64,
@@ -25,7 +25,7 @@ pub struct MicrosoftIdTokenClaims {
     /// A GUID representing the Azure AD tenant the user belongs to.
     pub tid: Option<String>,
     /// The user's UPN (User Principal Name), e.g. `"user@contoso.com"`.
-    /// May be unverified — do not rely on it as a secure identifier.
+    /// May be unverified. Do not rely on it as a secure identifier.
     pub upn: Option<String>,
     /// The user's display name.
     pub name: Option<String>,

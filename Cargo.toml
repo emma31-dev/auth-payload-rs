@@ -1,6 +1,6 @@
 [package]
 name = "auth-payload-rs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 authors = ["Emmanuel Essien"]
 description = "A global payload library that contains the common authentiation payload from providers like Google, github, and facebook"

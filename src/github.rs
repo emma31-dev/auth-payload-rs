@@ -7,7 +7,7 @@ use serde::Deserialize;
 #[derive(Debug, Clone, Deserialize)]
 pub struct GitHubUserPayload {
     /// The unique numeric identifier for the user. Permanent and never reused.
-    /// Always use this as the primary identifier — `login` can change at any time.
+    /// Always use this as the primary identifier, `login`, can change at any time.
     pub id: u64,
     /// The alphanumeric handle (e.g. `"octocat"`). Can be changed by the user; never use as a key.
     pub login: String,
@@ -39,7 +39,7 @@ pub struct GitHubUserPayload {
     pub events_url: String,
     /// API URL for events received by this user.
     pub received_events_url: String,
-    /// Account type — typically `"User"` or `"Organization"`.
+    /// Account type typically `"User"` or `"Organization"`.
     #[serde(rename = "type")]
     pub account_type: String,
     /// Whether the user is a GitHub site administrator.
@@ -119,6 +119,6 @@ pub struct GitHubEmailItem {
     pub primary: bool,
     /// Whether GitHub has verified ownership of this address.
     pub verified: bool,
-    /// Visibility setting — `"public"`, `"private"`, or `None`.
+    /// Visibility setting: `Some("public")`, `Some("private")`, or `None`.
     pub visibility: Option<String>,
 }
