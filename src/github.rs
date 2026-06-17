@@ -122,3 +122,106 @@ pub struct GitHubEmailItem {
     /// Visibility setting: `Some("public")`, `Some("private")`, or `None`.
     pub visibility: Option<String>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn user_payload_full() {
+        let json = r#"{
+            "id": 1,
+            "login": "octocat",
+            "node_id": "MDQ6VXNlcjE=",
+            "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/octocat",
+            "html_url": "https://github.com/octocat",
+            "followers_url": "https://api.github.com/users/octocat/followers",
+            "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+            "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+            "organizations_url": "https://api.github.com/users/octocat/orgs",
+            "repos_url": "https://api.github.com/users/octocat/repos",
+            "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/octocat/received_events",
+            "type": "User",
+            "site_admin": false,
+            "name": "monalisa octocat",
+            "company": "GitHub",
+            "blog": "https://github.com/blog",
+            "location": "San Francisco",
+            "email": "octocat@github.com",
+            "hireable": false,
+            "bio": "There once was...",
+            "twitter_username": "monatheoctocat",
+            "public_repos": 2,
+            "public_gists": 1,
+            "followers": 20,
+            "following": 0,
+            "created_at": "2008-01-14T04:33:35Z",
+            "updated_at": "2008-01-14T04:33:35Z",
+            "private_gists": 81,
+            "total_private_repos": 100,
+            "owned_private_repos": 100,
+            "disk_usage": 10000,
+            "collaborators": 8,
+            "two_factor_authentication": true,
+            "plan": { "name": "Medium", "space": 400, "private_repos": 20, "collaborators": 0 }
+        }"#;
+        let u: GitHubUserPayload = serde_json::from_str(json).unwrap();
+        assert_eq!(u.id, 1);
+        assert_eq!(u.login, "octocat");
+        assert_eq!(u.account_type, "User");
+        assert!(!u.site_admin);
+        assert_eq!(u.email.as_deref(), Some("octocat@github.com"));
+        assert_eq!(u.two_factor_authentication, Some(true));
+        assert_eq!(u.plan.as_ref().unwrap().name, "Medium");
+    }
+
+    #[test]
+    fn user_payload_minimal() {
+        let json = r#"{
+            "id": 2,
+            "login": "ghost",
+            "node_id": "abc",
+            "avatar_url": "https://example.com/avatar.png",
+            "url": "https://api.github.com/users/ghost",
+            "html_url": "https://github.com/ghost",
+            "followers_url": "https://api.github.com/users/ghost/followers",
+            "following_url": "https://api.github.com/users/ghost/following",
+            "gists_url": "https://api.github.com/users/ghost/gists",
+            "starred_url": "https://api.github.com/users/ghost/starred",
+            "subscriptions_url": "https://api.github.com/users/ghost/subscriptions",
+            "organizations_url": "https://api.github.com/users/ghost/orgs",
+            "repos_url": "https://api.github.com/users/ghost/repos",
+            "events_url": "https://api.github.com/users/ghost/events",
+            "received_events_url": "https://api.github.com/users/ghost/received_events",
+            "type": "User",
+            "site_admin": false,
+            "public_repos": 0,
+            "public_gists": 0,
+            "followers": 0,
+            "following": 0,
+            "created_at": "2020-01-01T00:00:00Z",
+            "updated_at": "2020-01-01T00:00:00Z"
+        }"#;
+        let u: GitHubUserPayload = serde_json::from_str(json).unwrap();
+        assert_eq!(u.id, 2);
+        assert!(u.email.is_none());
+        assert!(u.plan.is_none());
+        assert!(u.two_factor_authentication.is_none());
+    }
+
+    #[test]
+    fn email_item() {
+        let json = r#"[
+            {"email": "primary@example.com", "primary": true, "verified": true, "visibility": "private"},
+            {"email": "other@example.com", "primary": false, "verified": true, "visibility": null}
+        ]"#;
+        let items: Vec<GitHubEmailItem> = serde_json::from_str(json).unwrap();
+        let primary = items.iter().find(|e| e.primary && e.verified).unwrap();
+        assert_eq!(primary.email, "primary@example.com");
+    }
+}

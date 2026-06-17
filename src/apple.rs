@@ -38,3 +38,49 @@ pub struct AppleIdTokenClaims {
     /// A token the app can use to transfer the user's account to another app in the same team.
     pub transfer_sub: Option<String>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn id_token_claims_full() {
+        let json = r#"{
+            "iss": "https://appleid.apple.com",
+            "aud": "com.example.app",
+            "iat": 1700000000,
+            "exp": 1700003600,
+            "sub": "000111.abcdef1234567890abcdef.1234",
+            "nonce": "n-0S6_WzA2M",
+            "nonce_supported": true,
+            "email": "user@privaterelay.appleid.com",
+            "email_verified": "true",
+            "is_private_email": "true",
+            "real_user_status": 2,
+            "transfer_sub": "transfer-token-abc"
+        }"#;
+        let c: AppleIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.iss, "https://appleid.apple.com");
+        assert_eq!(c.sub, "000111.abcdef1234567890abcdef.1234");
+        assert_eq!(c.email.as_deref(), Some("user@privaterelay.appleid.com"));
+        assert_eq!(c.email_verified.as_deref(), Some("true"));
+        assert_eq!(c.is_private_email.as_deref(), Some("true"));
+        assert_eq!(c.real_user_status, Some(2));
+    }
+
+    #[test]
+    fn id_token_claims_minimal() {
+        let json = r#"{
+            "iss": "https://appleid.apple.com",
+            "aud": "com.example.app",
+            "iat": 1700000000,
+            "exp": 1700003600,
+            "sub": "000111.abc.1234"
+        }"#;
+        let c: AppleIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.sub, "000111.abc.1234");
+        assert!(c.email.is_none());
+        assert!(c.nonce.is_none());
+        assert!(c.real_user_status.is_none());
+    }
+}

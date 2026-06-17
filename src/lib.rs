@@ -277,6 +277,7 @@ pub mod discord;
 pub mod facebook;
 #[cfg(any(feature = "github"))]
 pub mod github;
+#[cfg(any(feature = "google"))]
 pub mod google;
 #[cfg(any(feature = "linkedin"))]
 pub mod linkedin;

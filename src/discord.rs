@@ -43,3 +43,52 @@ pub struct DiscordIdTokenClaims {
     /// The user's display name if one is set. Supersedes `username` in UI contexts.
     pub global_name: Option<String>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn id_token_claims_full() {
+        let json = r#"{
+            "id": "80351110224678912",
+            "username": "nelly",
+            "discriminator": "0",
+            "global_name": "Nelly",
+            "avatar": "8342729096ea3675442027381ff50dfe",
+            "bot": false,
+            "system": false,
+            "mfa_enabled": true,
+            "banner": "banner-hash",
+            "accent_color": 16711680,
+            "locale": "en-US",
+            "email": "nelly@example.com",
+            "verified": true,
+            "flags": 64,
+            "premium_type": 2,
+            "public_flags": 64
+        }"#;
+        let c: DiscordIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.id, "80351110224678912");
+        assert_eq!(c.username, "nelly");
+        assert_eq!(c.discriminator, "0");
+        assert_eq!(c.global_name.as_deref(), Some("Nelly"));
+        assert_eq!(c.email.as_deref(), Some("nelly@example.com"));
+        assert_eq!(c.verified, Some(true));
+        assert_eq!(c.premium_type, Some(2));
+    }
+
+    #[test]
+    fn id_token_claims_minimal() {
+        let json = r#"{
+            "id": "123",
+            "username": "ghost",
+            "discriminator": "0"
+        }"#;
+        let c: DiscordIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.id, "123");
+        assert!(c.email.is_none());
+        assert!(c.avatar.is_none());
+        assert!(c.mfa_enabled.is_none());
+    }
+}

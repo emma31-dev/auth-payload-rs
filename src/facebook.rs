@@ -95,3 +95,58 @@ pub struct FacebookPictureData {
     /// Height of the image in pixels. Present when a specific size was requested.
     pub height: Option<u32>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn user_payload_full() {
+        let json = r#"{
+            "id": "123456789",
+            "name": "Jane Doe",
+            "first_name": "Jane",
+            "middle_name": null,
+            "last_name": "Doe",
+            "short_name": "Jane",
+            "name_format": "{first} {last}",
+            "picture": {
+                "data": {
+                    "url": "https://example.com/pic.jpg",
+                    "is_silhouette": false,
+                    "width": 100,
+                    "height": 100
+                }
+            },
+            "email": "jane@example.com",
+            "birthday": "01/01/1990",
+            "gender": "female",
+            "location": {"id": "1", "name": "London"},
+            "hometown": {"id": "2", "name": "Bristol"},
+            "link": "https://www.facebook.com/jane",
+            "age_range": {"min": 21}
+        }"#;
+        let u: FacebookUserPayload = serde_json::from_str(json).unwrap();
+        assert_eq!(u.id, "123456789");
+        assert_eq!(u.name, "Jane Doe");
+        assert_eq!(u.email.as_deref(), Some("jane@example.com"));
+        assert_eq!(u.gender.as_deref(), Some("female"));
+        let pic = u.picture.unwrap();
+        assert!(!pic.data.is_silhouette);
+        assert_eq!(pic.data.width, Some(100));
+        let loc = u.location.unwrap();
+        assert_eq!(loc.name.as_deref(), Some("London"));
+        assert_eq!(u.age_range.as_ref().unwrap().min, Some(21));
+    }
+
+    #[test]
+    fn user_payload_minimal() {
+        let json = r#"{ "id": "987", "name": "Ghost" }"#;
+        let u: FacebookUserPayload = serde_json::from_str(json).unwrap();
+        assert_eq!(u.id, "987");
+        assert_eq!(u.name, "Ghost");
+        assert!(u.email.is_none());
+        assert!(u.picture.is_none());
+        assert!(u.location.is_none());
+    }
+}

@@ -63,6 +63,7 @@ pub struct GoogleIdTokenClaims {
     pub hd: Option<String>,
 }
 
+#[derive(Debug, Clone, Deserialize)]
 pub struct GoogleUserInfoResponse {
     ///An identifier for the user, unique among all Google Accounts and never reused.
     /// Case-sensitive string not exceeding 255 characters.
@@ -81,4 +82,83 @@ pub struct GoogleUserInfoResponse {
     pub email_verified: Option<bool>,
     /// The hosted domain associated with the user's Google Workspace or Cloud organization.
     pub hud: Option<String>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn id_token_claims_full() {
+        let json = r#"{
+            "iss": "https://accounts.google.com",
+            "sub": "1234567890",
+            "aud": "your-client-id.apps.googleusercontent.com",
+            "iat": 1700000000,
+            "exp": 1700003600,
+            "azp": "your-client-id.apps.googleusercontent.com",
+            "nonce": "abc123",
+            "auth_time": 1700,
+            "at_hash": 42,
+            "name": "Jane Doe",
+            "given_name": "Jane",
+            "family_name": "Doe",
+            "picture": "https://example.com/photo.jpg",
+            "email": "jane@example.com",
+            "email_verified": true,
+            "hd": "example.com"
+        }"#;
+        let c: GoogleIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.iss, "https://accounts.google.com");
+        assert_eq!(c.sub, "1234567890");
+        assert_eq!(c.aud, "your-client-id.apps.googleusercontent.com");
+        assert_eq!(c.iat, 1700000000);
+        assert_eq!(c.exp, 1700003600);
+        assert_eq!(c.email.as_deref(), Some("jane@example.com"));
+        assert_eq!(c.email_verified, Some(true));
+        assert_eq!(c.hd.as_deref(), Some("example.com"));
+    }
+
+    #[test]
+    fn id_token_claims_minimal() {
+        let json = r#"{
+            "iss": "https://accounts.google.com",
+            "sub": "1234567890",
+            "aud": "client-id",
+            "iat": 1700000000,
+            "exp": 1700003600
+        }"#;
+        let c: GoogleIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.sub, "1234567890");
+        assert!(c.email.is_none());
+        assert!(c.hd.is_none());
+        assert!(c.name.is_none());
+    }
+
+    #[test]
+    fn userinfo_response_full() {
+        let json = r#"{
+            "sub": "1234567890",
+            "name": "Jane Doe",
+            "given_name": "Jane",
+            "family_name": "Doe",
+            "picture": "https://example.com/photo.jpg",
+            "email": "jane@example.com",
+            "email_verified": true,
+            "hud": "example.com"
+        }"#;
+        let u: GoogleUserInfoResponse = serde_json::from_str(json).unwrap();
+        assert_eq!(u.sub, "1234567890");
+        assert_eq!(u.email.as_deref(), Some("jane@example.com"));
+        assert_eq!(u.hud.as_deref(), Some("example.com"));
+    }
+
+    #[test]
+    fn userinfo_response_minimal() {
+        let json = r#"{ "sub": "1234567890" }"#;
+        let u: GoogleUserInfoResponse = serde_json::from_str(json).unwrap();
+        assert_eq!(u.sub, "1234567890");
+        assert!(u.email.is_none());
+        assert!(u.name.is_none());
+    }
 }

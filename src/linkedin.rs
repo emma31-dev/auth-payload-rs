@@ -34,3 +34,48 @@ pub struct LinkedInIdTokenClaims {
     /// Whether the user's email address has been verified. Present when `email` scope is granted.
     pub email_verified: Option<bool>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn id_token_claims_full() {
+        let json = r#"{
+            "iss": "https://www.linkedin.com",
+            "aud": "my-client-id",
+            "iat": 1700000000,
+            "exp": 1700003600,
+            "sub": "linkedin-user-id",
+            "name": "Jane Doe",
+            "given_name": "Jane",
+            "family_name": "Doe",
+            "picture": "https://media.licdn.com/photo.jpg",
+            "locale": "en_US",
+            "email": "jane@example.com",
+            "email_verified": true
+        }"#;
+        let c: LinkedInIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.iss, "https://www.linkedin.com");
+        assert_eq!(c.sub, "linkedin-user-id");
+        assert_eq!(c.name.as_deref(), Some("Jane Doe"));
+        assert_eq!(c.email.as_deref(), Some("jane@example.com"));
+        assert_eq!(c.email_verified, Some(true));
+    }
+
+    #[test]
+    fn id_token_claims_minimal() {
+        let json = r#"{
+            "iss": "https://www.linkedin.com",
+            "aud": "my-client-id",
+            "iat": 1700000000,
+            "exp": 1700003600,
+            "sub": "linkedin-user-id"
+        }"#;
+        let c: LinkedInIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.sub, "linkedin-user-id");
+        assert!(c.name.is_none());
+        assert!(c.email.is_none());
+        assert!(c.email_verified.is_none());
+    }
+}

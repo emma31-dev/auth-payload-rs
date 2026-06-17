@@ -58,3 +58,66 @@ pub struct MicrosoftIdTokenClaims {
     /// Groups the user is a member of, when group claims are configured.
     pub groups: Option<Vec<String>>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn id_token_claims_full() {
+        let json = r#"{
+            "iss": "https://login.microsoftonline.com/tenant-id/v2.0",
+            "aud": "my-client-id",
+            "iat": 1700000000,
+            "exp": 1700003600,
+            "nbf": 1700000000,
+            "sub": "AAAAAAAAAAAAAAAAAAAAAIkzqFVrSaSaFHy782bbtaQ",
+            "oid": "00000000-0000-0000-66f3-3332eca7ea81",
+            "tid": "tenant-id",
+            "upn": "jane@contoso.com",
+            "name": "Jane Doe",
+            "given_name": "Jane",
+            "family_name": "Doe",
+            "email": "jane@contoso.com",
+            "preferred_username": "jane@contoso.com",
+            "picture": null,
+            "nonce": "nonce-value",
+            "acr": "1",
+            "amr": ["pwd", "mfa"],
+            "auth_time": 1700000000,
+            "at_hash": "at-hash-value",
+            "c_hash": "c-hash-value",
+            "roles": ["Admin"],
+            "groups": ["group-id-1"]
+        }"#;
+        let c: MicrosoftIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.iss, "https://login.microsoftonline.com/tenant-id/v2.0");
+        assert_eq!(c.sub, "AAAAAAAAAAAAAAAAAAAAAIkzqFVrSaSaFHy782bbtaQ");
+        assert_eq!(
+            c.oid.as_deref(),
+            Some("00000000-0000-0000-66f3-3332eca7ea81")
+        );
+        assert_eq!(c.tid.as_deref(), Some("tenant-id"));
+        assert_eq!(c.email.as_deref(), Some("jane@contoso.com"));
+        assert_eq!(c.amr.as_ref().unwrap(), &["pwd", "mfa"]);
+        assert_eq!(c.roles.as_ref().unwrap(), &["Admin"]);
+    }
+
+    #[test]
+    fn id_token_claims_minimal() {
+        let json = r#"{
+            "iss": "https://login.microsoftonline.com/tenant-id/v2.0",
+            "aud": "my-client-id",
+            "iat": 1700000000,
+            "exp": 1700003600,
+            "nbf": 1700000000,
+            "sub": "user-sub"
+        }"#;
+        let c: MicrosoftIdTokenClaims = serde_json::from_str(json).unwrap();
+        assert_eq!(c.sub, "user-sub");
+        assert!(c.oid.is_none());
+        assert!(c.email.is_none());
+        assert!(c.roles.is_none());
+        assert!(c.groups.is_none());
+    }
+}
