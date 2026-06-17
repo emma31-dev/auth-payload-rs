@@ -1,12 +1,13 @@
 [package]
 name = "auth-payload-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
+authors = ["Emmanuel Essien"]
 description = "A global payload library that contains the common authentiation payload from providers like Google, github, and facebook"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/emma31-dev/auth-payload-rs"
-keywords = ["auth", "deserialization", "payload", "authentiation Response"]
+keywords = ["auth", "deserialization", "payload"]
 categories = ["authentication"]
 
 [lib]
@@ -15,3 +16,13 @@ src = "src/lib.rs"
 [dependencies]
 cargo-rdme = "1.5.1"
 serde = { version = "1.0.228", features = ["derive"] }
+
+[features]
+default = ["google"]
+google = []
+facebook = []
+apple = []
+github = []
+discord = []
+linkedin = []
+microsoft = []

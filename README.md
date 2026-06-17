@@ -11,7 +11,7 @@ Most auth libraries are monolithic. This crate provides the raw, audited `struct
 1. For Google's standard JWT Metadata Claims
 ```rust
 // Other imports
-use auth-payload-rs::GoogleIdTokenClaims;
+use auth-payload-rs::google::GoogleIdTokenClaims;
 
 fn googleCallback(Json(payload): Json<GoogleIdTokenClaims>, /* Other arguments */) -> Result<(), ()> {
     // Do stuff with payload
@@ -20,7 +20,7 @@ fn googleCallback(Json(payload): Json<GoogleIdTokenClaims>, /* Other arguments *
 2. For Google's UserInfo Endpoint
 ```rust
 // Other imports
-use auth-payload-rs::GoogleUserInfoResponse;
+use auth-payload-rs::google::GoogleUserInfoResponse;
 
 fn googleCallback(Json(payload): Json<GoogleUserInfoResponse>, /* Other arguments */) -> Result<(), ()> {
     // Do stuff with payload
@@ -48,7 +48,7 @@ pub struct GoogleIdTokenClaims {
     pub family_name: Option<String>, // The user's surname
     pub picture: Option<String>, // The URL of the user's profile picture
     pub email: Option<String>, // The user's email address
-    pub email_verified: bool, // Does it need explanation?
+    pub email_verified: Option<bool>, // Does it need explanation?
     pub hd: Option<String>, // The domain associated with the Google Workspace
 }
 ```
@@ -62,7 +62,7 @@ pub struct GoogleUserInfoResponse {
     pub family_name: Option<String>, // The user's surname(s) or last name(s).
     pub picture: Option<String>, // The URL of the user's profile picture.
     pub email: Option<String>, // The user's email address.
-    pub email_verified: bool, // Whether the user's email address has been verified.
+    pub email_verified: Option<bool>, // Whether the user's email address has been verified.
     pub hud: Option<String>, // The hosted domain associated with the user's Google Workspace or Cloud organization.
 }
 ```
